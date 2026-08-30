@@ -1,0 +1,35 @@
+{
+  "name": "crimeverse",
+  "version": "0.2.2",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "15.1.3",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "three": "0.170.0",
+    "@react-three/fiber": "^9.0.0",
+    "@react-three/drei": "^10.0.0",
+    "zustand": "5.0.2",
+    "uuid": "11.0.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.11",
+    "@types/node": "20.17.0",
+    "@types/react": "19.0.0",
+    "@types/react-dom": "19.0.0",
+    "@types/three": "0.170.0",
+    "@types/uuid": "10.0.0",
+    "eslint-config-next": "15.1.3",
+    "tailwindcss": "^4.1.11",
+    "typescript": "5.7.2"
+  },
+  "overrides": {
+    "react": "19.0.0",
+    "react-dom": "19.0.0"
+  }
+}
