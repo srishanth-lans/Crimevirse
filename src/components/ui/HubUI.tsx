@@ -4,6 +4,15 @@ import { useGameStore } from "@/store/gameStore";
 import { CASES } from "@/data/cases";
 import ChatPanel from "./ChatPanel";
 
+const DIFFICULTY_STYLE: Record<string, { bg: string; label: string }> = {
+  tutorial: { bg: "var(--forensic-teal)", label: "TRAINING" },
+  easy: { bg: "var(--forensic-teal)", label: "EASY" },
+  medium: { bg: "var(--lamp-amber-dim)", label: "MEDIUM" },
+  hard: { bg: "var(--evidence-red)", label: "HARD" },
+};
+
+const TILTS = ["-1.5deg", "1deg", "-0.5deg"];
+
 export default function HubUI() {
   const player = useGameStore((s) => s.player);
   const setCurrentCase = useGameStore((s) => s.setCurrentCase);
@@ -23,34 +32,42 @@ export default function HubUI() {
   return (
     <div className="absolute inset-0 pointer-events-none">
       {/* Top bar */}
-      <div className="pointer-events-auto absolute top-0 left-0 right-0 p-4 flex justify-between items-start bg-gradient-to-b from-black/70 to-transparent">
+      <div
+        className="pointer-events-auto absolute top-0 left-0 right-0 p-4 flex justify-between items-start"
+        style={{ background: "linear-gradient(to bottom, rgba(0,0,0,0.75), transparent)" }}
+      >
         <div className="flex items-center gap-3">
           {player.photoDataUrl && (
             <img
               src={player.photoDataUrl}
               alt=""
-              className="w-12 h-12 rounded-full border-2 border-blue-400 object-cover"
+              className="w-12 h-12 object-cover"
+              style={{ border: "2px solid var(--lamp-amber)" }}
             />
           )}
           <div>
-            <div className="font-bold text-white">{player.name}</div>
-            <div className="text-sm text-blue-300">{roleLabel}</div>
+            <div className="font-display font-semibold uppercase tracking-wide" style={{ color: "var(--paper)" }}>
+              {player.name}
+            </div>
+            <div className="text-xs" style={{ color: "var(--lamp-amber)" }}>{roleLabel}</div>
           </div>
         </div>
         <div className="flex gap-2">
           <button
             onClick={toggleOnline}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-              isOnline
-                ? "bg-green-600 text-white shadow-lg shadow-green-900/40"
-                : "bg-slate-700 text-slate-300 hover:bg-slate-600"
-            }`}
+            className="ink-press px-4 py-2 text-xs font-display uppercase tracking-wide transition-colors"
+            style={{
+              background: isOnline ? "var(--forensic-teal)" : "var(--noir-bg-raised)",
+              color: "var(--paper)",
+              border: `1px solid ${isOnline ? "var(--forensic-teal-bright)" : "var(--paper-dim)"}`,
+            }}
           >
             {isOnline ? "● Online" : "○ Go Online"}
           </button>
           <button
             onClick={() => setPhase("character")}
-            className="px-4 py-2 rounded-lg text-sm bg-slate-700 text-slate-300 hover:bg-slate-600"
+            className="ink-press px-4 py-2 text-xs font-display uppercase tracking-wide"
+            style={{ background: "var(--noir-bg-raised)", color: "var(--paper-dim)", border: "1px solid var(--paper-dim)" }}
           >
             Change Character
           </button>
@@ -58,36 +75,54 @@ export default function HubUI() {
       </div>
 
       {/* Case selection panel */}
-      <div className="pointer-events-auto absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/90 via-black/70 to-transparent">
-        <h2 className="text-xl font-bold text-white mb-1">Available Cases</h2>
-        <p className="text-xs text-slate-400 mb-4">Walk to red markers or select below</p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-5xl">
-          {CASES.map((c) => (
-            <button
-              key={c.id}
-              onClick={() => setCurrentCase(c)}
-              className="text-left p-4 rounded-xl bg-slate-900/90 border border-slate-700 hover:border-blue-500 hover:bg-slate-800 transition group"
-            >
-              <div className="flex justify-between items-start mb-2">
-                <span className="font-semibold text-white group-hover:text-blue-300">
-                  {c.title}
-                </span>
+      <div
+        className="pointer-events-auto absolute bottom-0 left-0 right-0 p-6"
+        style={{ background: "linear-gradient(to top, rgba(0,0,0,0.92), rgba(0,0,0,0.7) 60%, transparent)" }}
+      >
+        <h2 className="font-display text-xl font-semibold uppercase tracking-wide mb-1" style={{ color: "var(--paper)" }}>
+          Open Cases
+        </h2>
+        <p className="text-xs mb-4" style={{ color: "var(--paper-dim)" }}>
+          Walk to a red marker, or pull a file below
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-5xl">
+          {CASES.map((c, i) => {
+            const diff = DIFFICULTY_STYLE[c.difficulty] ?? DIFFICULTY_STYLE.medium;
+            return (
+              <button
+                key={c.id}
+                onClick={() => setCurrentCase(c)}
+                className="index-card text-left p-4 relative"
+                style={
+                  {
+                    "--tilt": TILTS[i % TILTS.length],
+                    transform: `rotate(${TILTS[i % TILTS.length]})`,
+                    background: "var(--paper)",
+                    color: "#1c1712",
+                    boxShadow: "0 8px 18px -6px rgba(0,0,0,0.5)",
+                  } as React.CSSProperties
+                }
+              >
                 <span
-                  className={`text-xs px-2 py-0.5 rounded ${
-                    c.difficulty === "tutorial"
-                      ? "bg-green-900 text-green-300"
-                      : c.difficulty === "medium"
-                      ? "bg-amber-900 text-amber-300"
-                      : "bg-red-900 text-red-300"
-                  }`}
-                >
-                  {c.difficulty}
-                </span>
-              </div>
-              <p className="text-sm text-slate-400 line-clamp-2">{c.briefing}</p>
-              <div className="mt-3 text-xs text-slate-500">{c.location}</div>
-            </button>
-          ))}
+                  className="absolute -top-2 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full"
+                  style={{ background: "var(--evidence-red-bright)", boxShadow: "0 1px 3px rgba(0,0,0,0.6)" }}
+                />
+                <div className="flex justify-between items-start mb-2 gap-2">
+                  <span className="font-display font-semibold uppercase text-sm tracking-wide">
+                    {c.title}
+                  </span>
+                  <span
+                    className="text-[10px] px-1.5 py-0.5 font-display tracking-wider text-white shrink-0"
+                    style={{ background: diff.bg }}
+                  >
+                    {diff.label}
+                  </span>
+                </div>
+                <p className="text-xs leading-relaxed opacity-80 line-clamp-3">{c.briefing}</p>
+                <div className="mt-3 text-[10px] uppercase tracking-wide opacity-60">📍 {c.location}</div>
+              </button>
+            );
+          })}
         </div>
       </div>
 

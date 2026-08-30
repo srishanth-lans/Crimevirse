@@ -4,24 +4,24 @@ import { useState, useRef, useCallback } from "react";
 import { useGameStore } from "@/store/gameStore";
 import type { Role } from "@/types";
 
-const ROLES: { id: Role; title: string; desc: string; color: string }[] = [
+const ROLES: { id: Role; title: string; desc: string; accent: string }[] = [
   {
     id: "police",
     title: "Police Officer",
     desc: "Authority on the street. Interrogate, pursue, and protect the city.",
-    color: "from-blue-600 to-blue-800",
+    accent: "var(--night-blue-bright)",
   },
   {
     id: "forensic",
     title: "Forensic Expert",
     desc: "See what others miss. Analyse evidence, reconstruct scenes, find the truth in the details.",
-    color: "from-emerald-600 to-teal-800",
+    accent: "var(--forensic-teal-bright)",
   },
   {
     id: "detective",
     title: "Detective",
     desc: "Connect the dots. Cold cases, interviews, and the long game of deduction.",
-    color: "from-amber-600 to-orange-800",
+    accent: "var(--lamp-amber)",
   },
 ];
 
@@ -100,20 +100,27 @@ export default function CharacterCreator() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-6">
-      <div className="max-w-4xl w-full">
-        <h1 className="text-4xl font-bold tracking-tight mb-2 text-center">
+    <div
+      className="min-h-screen flex flex-col items-center justify-center p-6"
+      style={{ background: "var(--noir-bg)", color: "var(--paper)" }}
+    >
+      <div className="max-w-4xl w-full phase-enter">
+        <p className="font-display text-center text-xs tracking-[0.4em] mb-2" style={{ color: "var(--lamp-amber-dim)" }}>
+          PERSONNEL FILE
+        </p>
+        <h1 className="font-display text-4xl font-semibold uppercase tracking-wide mb-2 text-center">
           Create Your Investigator
         </h1>
-        <p className="text-slate-400 text-center mb-10">
-          Upload a photo of yourself. We’ll turn you into a character in CrimeVerse.
+        <p className="text-center mb-10 text-sm" style={{ color: "var(--paper-dim)" }}>
+          Upload a photo of yourself. We&rsquo;ll turn you into a character in CrimeVerse.
         </p>
 
         <div className="grid md:grid-cols-2 gap-10">
           {/* Photo side */}
           <div className="flex flex-col items-center gap-4">
             <div
-              className="relative w-64 h-64 rounded-2xl overflow-hidden border-2 border-slate-700 bg-slate-900 cursor-pointer group"
+              className="relative w-64 h-64 overflow-hidden cursor-pointer group"
+              style={{ border: "2px solid var(--lamp-amber-dim)", background: "var(--noir-bg-raised)" }}
               onClick={() => fileRef.current?.click()}
             >
               {photoPreview ? (
@@ -123,7 +130,7 @@ export default function CharacterCreator() {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center text-slate-500">
+                <div className="w-full h-full flex flex-col items-center justify-center" style={{ color: "var(--paper-dim)" }}>
                   <svg
                     className="w-16 h-16 mb-3 opacity-60"
                     fill="none"
@@ -142,7 +149,10 @@ export default function CharacterCreator() {
               )}
               {processing && (
                 <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                  <div className="animate-spin w-8 h-8 border-2 border-white border-t-transparent rounded-full" />
+                  <div
+                    className="animate-spin w-8 h-8 border-2 border-t-transparent rounded-full"
+                    style={{ borderColor: "var(--lamp-amber)", borderTopColor: "transparent" }}
+                  />
                 </div>
               )}
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition flex items-end justify-center pb-4 opacity-0 group-hover:opacity-100">
@@ -157,7 +167,7 @@ export default function CharacterCreator() {
               onChange={handlePhoto}
             />
             <canvas ref={canvasRef} className="hidden" />
-            <p className="text-xs text-slate-500 text-center max-w-xs">
+            <p className="text-xs text-center max-w-xs opacity-60">
               Use a clear front-facing photo. We apply a light stylization so you look like a game character.
             </p>
           </div>
@@ -165,7 +175,7 @@ export default function CharacterCreator() {
           {/* Form side */}
           <div className="flex flex-col gap-6">
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">
+              <label className="block text-xs font-display uppercase tracking-wide mb-2" style={{ color: "var(--paper-dim)" }}>
                 Callsign / Name
               </label>
               <input
@@ -173,13 +183,14 @@ export default function CharacterCreator() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. Detective Kane"
-                className="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 focus:border-blue-500 focus:outline-none transition"
+                className="w-full px-4 py-3 focus:outline-none transition-colors"
+                style={{ background: "var(--noir-bg-raised)", border: "1px solid #3a3229", color: "var(--paper)" }}
                 maxLength={24}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-3">
+              <label className="block text-xs font-display uppercase tracking-wide mb-3" style={{ color: "var(--paper-dim)" }}>
                 Choose Your Role
               </label>
               <div className="space-y-3">
@@ -188,14 +199,17 @@ export default function CharacterCreator() {
                     key={r.id}
                     type="button"
                     onClick={() => setRole(r.id)}
-                    className={`w-full text-left p-4 rounded-xl border transition ${
-                      role === r.id
-                        ? `bg-gradient-to-r ${r.color} border-transparent shadow-lg`
-                        : "bg-slate-900 border-slate-700 hover:border-slate-500"
-                    }`}
+                    className="ink-press w-full text-left p-4 transition-colors"
+                    style={{
+                      background: role === r.id ? "var(--noir-bg-raised)" : "transparent",
+                      border: `1px solid ${role === r.id ? r.accent : "#3a3229"}`,
+                      borderLeftWidth: role === r.id ? "4px" : "1px",
+                    }}
                   >
-                    <div className="font-semibold">{r.title}</div>
-                    <div className="text-sm opacity-80 mt-1">{r.desc}</div>
+                    <div className="font-display font-semibold uppercase tracking-wide text-sm" style={{ color: role === r.id ? r.accent : "var(--paper)" }}>
+                      {r.title}
+                    </div>
+                    <div className="text-xs opacity-70 mt-1">{r.desc}</div>
                   </button>
                 ))}
               </div>
@@ -204,7 +218,8 @@ export default function CharacterCreator() {
             <button
               onClick={handleStart}
               disabled={!name.trim()}
-              className="mt-4 w-full py-4 rounded-xl font-bold text-lg bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed transition shadow-lg shadow-blue-900/40"
+              className="ink-press mt-4 w-full py-4 font-display font-semibold uppercase tracking-wide text-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              style={{ background: "var(--evidence-red)", color: "var(--paper)" }}
             >
               Enter CrimeVerse
             </button>

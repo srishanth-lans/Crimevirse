@@ -1,20 +1,132 @@
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
-body {
-  background: #020617;
-  color: #f8fafc;
-  margin: 0;
-  font-family: system-ui, -apple-system, sans-serif;
-  overflow-x: hidden;
+:root {
+  --noir-bg: #151210;
+  --noir-bg-raised: #1e1a16;
+  --paper: #e8dfc8;
+  --paper-dim: #b8ae94;
+  --evidence-red: #b3221e;
+  --evidence-red-bright: #d63a30;
+  --lamp-amber: #c9a227;
+  --lamp-amber-dim: #8a7020;
+  --night-blue: #33495a;
+  --night-blue-bright: #4d7591;
+  --forensic-teal: #2f6b5e;
+  --forensic-teal-bright: #45a08c;
 }
 
-::-webkit-scrollbar {
-  width: 6px;
+* {
+  scrollbar-color: var(--lamp-amber-dim) transparent;
 }
-::-webkit-scrollbar-track {
-  background: transparent;
+
+body {
+  background: var(--noir-bg);
+  color: var(--paper);
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
 }
-::-webkit-scrollbar-thumb {
-  background: #475569;
-  border-radius: 3px;
+
+.font-display {
+  font-family: 'Oswald', sans-serif;
+  letter-spacing: 0.02em;
+}
+
+/* Ambient film grain, sits above everything, ignores clicks */
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain-shift 8s steps(8) infinite;
+}
+@keyframes grain-shift {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-2%, 2%); }
+  50% { transform: translate(2%, -2%); }
+  75% { transform: translate(-1%, -1%); }
+}
+
+/* Vignette for lamp-lit noir feel */
+.vignette::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 45%, rgba(0,0,0,0.55) 100%);
+}
+
+/* Camera-flash transition between phases */
+@keyframes camera-flash {
+  0% { opacity: 0.85; }
+  100% { opacity: 0; }
+}
+.phase-flash {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: white;
+  pointer-events: none;
+  animation: camera-flash 420ms ease-out forwards;
+}
+.phase-enter {
+  animation: phase-fade-in 380ms ease-out both;
+}
+@keyframes phase-fade-in {
+  from { opacity: 0; transform: scale(1.01); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Rubber stamp, slammed down */
+@keyframes stamp-slam {
+  0% { transform: translate(-50%, -50%) rotate(-14deg) scale(2.4); opacity: 0; }
+  55% { transform: translate(-50%, -50%) rotate(-14deg) scale(0.94); opacity: 1; }
+  70% { transform: translate(-50%, -50%) rotate(-14deg) scale(1.05); }
+  100% { transform: translate(-50%, -50%) rotate(-14deg) scale(1); opacity: 1; }
+}
+.stamp {
+  animation: stamp-slam 480ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+
+/* Ink-press effect for buttons */
+.ink-press {
+  transition: transform 120ms ease, filter 120ms ease;
+}
+.ink-press:active {
+  transform: scale(0.96) rotate(-0.5deg);
+  filter: brightness(0.9);
+}
+
+/* Index-card pin wobble on hover */
+@keyframes card-settle {
+  from { transform: rotate(var(--tilt, -1deg)) translateY(6px); opacity: 0; }
+  to { transform: rotate(var(--tilt, -1deg)) translateY(0); opacity: 1; }
+}
+.index-card {
+  animation: card-settle 340ms ease-out both;
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+.index-card:hover {
+  transform: rotate(0deg) translateY(-3px) scale(1.015) !important;
+  box-shadow: 0 14px 28px -8px rgba(0,0,0,0.6);
+}
+
+/* Typewriter reveal for briefing text */
+@keyframes typewriter-caret {
+  from, to { border-color: transparent; }
+  50% { border-color: var(--lamp-amber); }
+}
+.typewriter-caret {
+  border-right: 2px solid var(--lamp-amber);
+  animation: typewriter-caret 900ms step-end infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grain-overlay, .phase-flash, .phase-enter, .stamp, .index-card, .typewriter-caret {
+    animation: none !important;
+  }
+  .ink-press:active { transform: none; }
 }
