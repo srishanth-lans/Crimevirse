@@ -26,6 +26,8 @@ interface GameStore extends GameState {
   removeDeductionLink: (id: string) => void;
   setAccused: (suspectId: string | null) => void;
   resetGame: () => void;
+  playerPosition: { x: number; z: number };
+  setPlayerPosition: (x: number, z: number) => void;
 }
 
 const initialState: GameState = {
@@ -168,6 +170,9 @@ export const useGameStore = create<GameStore>()(
       setAccused: (suspectId) => set({ accusedSuspectId: suspectId }),
 
       resetGame: () => set(initialState),
+
+      playerPosition: { x: 0, z: 4 },
+      setPlayerPosition: (x, z) => set({ playerPosition: { x, z } }),
     }),
     {
       name: "crimeverse-storage-v2",
