@@ -8,6 +8,7 @@ import { useGameStore } from "@/store/gameStore";
 import PlayerController from "./PlayerController";
 import { CASES } from "@/data/cases";
 import { CASE_MARKERS, DISTRICTS, MAP_BOUNDS } from "@/data/mapMarkers";
+import { BUILDINGS, PLATFORMS } from "@/data/buildings";
 import Minimap from "@/components/ui/Minimap";
 
 function Ground() {
@@ -164,6 +165,15 @@ function Bench({ position, rotationY = 0 }: { position: [number, number, number]
   );
 }
 
+function Platform({ position, size, height, color }: { position: [number, number, number]; size: [number, number, number]; height: number; color: string }) {
+  return (
+    <mesh position={[position[0], height / 2, position[2]]} receiveShadow castShadow>
+      <boxGeometry args={[size[0], height, size[2]]} />
+      <meshStandardMaterial color={color} />
+    </mesh>
+  );
+}
+
 function DistrictLabel({ name, position }: { name: string; position: [number, number, number] }) {
   return (
     <Text position={position} fontSize={1.1} color="#c9a227" anchorX="center" fillOpacity={0.35} outlineWidth={0.01} outlineColor="#000">
@@ -250,21 +260,14 @@ function CityContent() {
       <Street position={[24, 0, 0]} length={MAP_BOUNDS * 2.4} />
       <Street position={[-24, 0, 0]} length={MAP_BOUNDS * 2.4} />
 
+      {PLATFORMS.map((p) => (
+        <Platform key={p.id} position={p.position} size={p.size} height={p.height} color={p.color} />
+      ))}
+
       <PoliceStation />
-      <Building position={[-16, 3, -10]} size={[8, 6, 7]} color="#25211c" />
-      <Building position={[16, 4, -8]} size={[7, 8, 8]} color="#2b2620" />
-      <Building position={[-18, 2.5, 8]} size={[6, 5, 9]} color="#1e1a15" />
-      <Building position={[18, 3, 10]} size={[7, 6, 6]} color="#25211c" />
-      <Building position={[-10, 2, 20]} size={[10, 4, 5]} color="#100d0b" />
-      <Building position={[12, 2.5, 22]} size={[8, 5, 6]} color="#1e1a15" />
-      <Building position={[-22, 3.5, -20]} size={[5, 7, 5]} color="#2b2620" />
-      <Building position={[22, 2, -18]} size={[6, 4, 7]} color="#25211c" />
-      <Building position={[8, 1.8, -24]} size={[9, 3.5, 4]} color="#1e1a15" />
-      <Building position={[-8, 4, 28]} size={[5, 8, 5]} color="#100d0b" />
-      <Building position={[28, 3, -4]} size={[6, 6, 6]} color="#25211c" />
-      <Building position={[-28, 2.5, -6]} size={[7, 5, 7]} color="#1e1a15" />
-      <Building position={[26, 2, 28]} size={[6, 4, 6]} color="#2b2620" />
-      <Building position={[-26, 3, 22]} size={[6, 6, 6]} color="#100d0b" />
+      {BUILDINGS.filter((b) => b.id !== "precinct").map((b) => (
+        <Building key={b.id} position={b.position} size={b.size} color={b.color} />
+      ))}
 
       {DISTRICTS.map((d) => (
         <DistrictLabel key={d.name} name={d.name} position={[d.x, 8, d.z]} />
@@ -324,7 +327,8 @@ export default function CityScene() {
         style={{ background: "rgba(21,18,16,0.7)", color: "var(--paper-dim)" }}
       >
         <div className="font-display uppercase tracking-wide mb-1" style={{ color: "var(--lamp-amber)" }}>Controls</div>
-        <div>WASD / Arrows — Move</div>
+        <div>WASD / Arrows — Move · Space — Jump</div>
+        <div>Drag — Look around · Scroll — Zoom</div>
         <div>Click red markers — Start case</div>
       </div>
     </div>

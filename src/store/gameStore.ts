@@ -28,6 +28,8 @@ interface GameStore extends GameState {
   resetGame: () => void;
   playerPosition: { x: number; z: number };
   setPlayerPosition: (x: number, z: number) => void;
+  playerRotation: number;
+  setPlayerRotation: (r: number) => void;
 }
 
 const initialState: GameState = {
@@ -173,6 +175,8 @@ export const useGameStore = create<GameStore>()(
 
       playerPosition: { x: 0, z: 4 },
       setPlayerPosition: (x, z) => set({ playerPosition: { x, z } }),
+      playerRotation: 0,
+      setPlayerRotation: (r) => set({ playerRotation: r }),
     }),
     {
       name: "crimeverse-storage-v2",

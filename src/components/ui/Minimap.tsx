@@ -11,11 +11,12 @@ function toPct(v: number) {
 
 export default function Minimap() {
   const pos = useGameStore((s) => s.playerPosition);
+  const rotation = useGameStore((s) => s.playerRotation);
   const isNight = useGameStore((s) => s.isNight);
   const toggleNight = useGameStore((s) => s.toggleNight);
 
   return (
-    <div className="pointer-events-auto absolute top-20 right-4 flex flex-col items-end gap-2">
+    <div className="pointer-events-auto absolute top-20 right-4 flex flex-col items-end gap-2 phase-enter">
       <div
         className="relative overflow-hidden"
         style={{
@@ -34,6 +35,7 @@ export default function Minimap() {
               top: `${toPct(d.z)}%`,
               transform: "translate(-50%, -50%)",
               color: "var(--paper-dim)",
+              transition: "left 300ms linear, top 300ms linear",
             }}
           >
             {d.name}
@@ -42,26 +44,47 @@ export default function Minimap() {
         {CASE_MARKERS.map((m) => (
           <div
             key={m.caseId}
-            className="absolute w-1.5 h-1.5 rounded-full"
+            className="absolute"
             style={{
               left: `${toPct(m.x)}%`,
               top: `${toPct(m.z)}%`,
               transform: "translate(-50%, -50%)",
-              background: "var(--evidence-red-bright)",
-              boxShadow: "0 0 4px var(--evidence-red-bright)",
             }}
-          />
+          >
+            <div
+              className="absolute w-3 h-3 rounded-full -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2"
+              style={{ background: "var(--evidence-red-bright)", opacity: 0.35, animation: "minimap-ping 1.8s ease-out infinite" }}
+            />
+            <div
+              className="w-1.5 h-1.5 rounded-full"
+              style={{ background: "var(--evidence-red-bright)", boxShadow: "0 0 4px var(--evidence-red-bright)" }}
+            />
+          </div>
         ))}
+        {/* Player marker with facing-direction arrow, smoothly interpolated */}
         <div
-          className="absolute w-2 h-2 rounded-full"
+          className="absolute"
           style={{
             left: `${toPct(pos.x)}%`,
             top: `${toPct(pos.z)}%`,
             transform: "translate(-50%, -50%)",
-            background: "var(--lamp-amber)",
-            boxShadow: "0 0 6px var(--lamp-amber)",
+            transition: "left 140ms linear, top 140ms linear",
           }}
-        />
+        >
+          <div
+            style={{
+              width: 0,
+              height: 0,
+              borderLeft: "5px solid transparent",
+              borderRight: "5px solid transparent",
+              borderBottom: "9px solid var(--lamp-amber)",
+              transform: `rotate(${rotation}rad) translateY(-2px)`,
+              transformOrigin: "50% 60%",
+              filter: "drop-shadow(0 0 3px var(--lamp-amber))",
+              transition: "transform 100ms linear",
+            }}
+          />
+        </div>
       </div>
       <button
         onClick={toggleNight}
@@ -70,6 +93,12 @@ export default function Minimap() {
       >
         {isNight ? "☾ Night" : "☀ Day"}
       </button>
+      <style jsx>{`
+        @keyframes minimap-ping {
+          0% { transform: translate(-50%, -50%) scale(0.6); opacity: 0.45; }
+          70%, 100% { transform: translate(-50%, -50%) scale(2.6); opacity: 0; }
+        }
+      `}</style>
     </div>
   );
 }
